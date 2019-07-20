@@ -1,0 +1,17 @@
+{
+  "name": "@copperwall/rapid",
+  "version": "0.0.1-DEVELOPMENT",
+  "description": "A minimal HTTP library for node",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Chris Opperwall",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "typescript": "^3.5.3"
+  }
+}
