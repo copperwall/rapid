@@ -1,6 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
+import url from 'url';
 
-export interface Request extends IncomingMessage { }
+export interface Request extends IncomingMessage {
+    query: URLSearchParams
+}
 
 export interface Response extends ServerResponse { }
 
@@ -10,8 +13,22 @@ type MiddlewareFn = (
     next: Function
 ) => void
 
+const queryParser : MiddlewareFn = (req, res, next) => {
+    if (req.query === undefined && typeof req.url === "string") {
+        const parsedUrl = url.parse(req.url);
+        const query = parsedUrl.query || undefined;
+        req.query = new url.URLSearchParams(query)
+    }
+
+    next();
+}
+
+const defaultMiddlewares = [
+    queryParser
+];
+
 export default function lite_server() {
-    let middlewares : Array<MiddlewareFn> = [];
+    let middlewares : Array<MiddlewareFn> = [...defaultMiddlewares];
 
     function handleRequest(req : Request, res : Response, done : Function) {
         if (middlewares.length == 0) {
@@ -43,7 +60,7 @@ export default function lite_server() {
             callback = finalhandler(req, res);
         }
 
-        handleRequest(req, res, callback);
+        handleRequest(req as Request, res as Response, callback);
 
     }
 
@@ -60,7 +77,7 @@ interface ServerError {
     message?: string
 }
 
-function finalhandler(req: Request, res: Response) {
+function finalhandler(req: IncomingMessage, res: ServerResponse) {
     return function next(err?: ServerError) {
         if (err !== undefined) {
             const { message, statusCode, status } : { message?: string, statusCode?: number, status?: number } = err || {};

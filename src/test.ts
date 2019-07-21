@@ -21,9 +21,15 @@ app.use(function(req: Request, res: Response, next: Function) {
 });
 
 app.use(function(req, res, next) {
-    if (req.url === '/about') {
-        res.end('welcome to the about page');
-        return;
+    if (req.url !== undefined) {
+        if (req.url.match(/^\/about/)) {
+            const coolMode = req.query.get('coolMode') === 'true';
+            if (coolMode) {
+                res.write('!!COOL MODE ACTIVATED!!\n');
+            }
+            res.end('welcome to the about page');
+            return;
+        }
     }
 
     next();
