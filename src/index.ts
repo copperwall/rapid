@@ -27,7 +27,7 @@ const defaultMiddlewares = [
     queryParser
 ];
 
-export default function lite_server() {
+export default function rapid() {
     let middlewares : Array<MiddlewareFn> = [...defaultMiddlewares];
 
     function handleRequest(req : Request, res : Response, done : Function) {
