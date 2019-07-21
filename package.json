@@ -1,6 +1,6 @@
 {
   "name": "@copperwall/rapid",
-  "version": "0.0.1-DEVELOPMENT",
+  "version": "0.0.2-DEVELOPMENT",
   "description": "A minimal HTTP library for node",
   "main": "dist/index.js",
   "scripts": {
