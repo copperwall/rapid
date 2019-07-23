@@ -47,10 +47,10 @@ export default function rapid() {
                 return;
             }
 
-            middleware(req, res, next);
+            middleware(req, res, callOnce(next));
         }
 
-        middleware(req, res, next);
+        middleware(req, res, callOnce(next));
     }
 
     // This can be handle for now
@@ -96,4 +96,44 @@ function finalhandler(req: IncomingMessage, res: ServerResponse) {
             res.end();
         }
     }
+}
+
+function callOnce(fn: Function): Function {
+    let called = false;
+    return function callOnceFn(...args : Array<any>): any {
+        if (called === false) {
+            called = true;
+            return fn(...args);
+        }
+
+
+        const stack = (new Error()).stack || "";
+        const offendingFunction = getDoubleCalledMiddlewareFunction(stack);
+
+        if (offendingFunction !== undefined) {
+            console.debug(`Middleware called next twice: ${offendingFunction}`);
+        } else {
+            console.debug("Middleware function's next function was called twice.");
+        }
+    };
+}
+
+/**
+ * Takes a stack from Error.stack and returns the location an name of the
+ * function that was called twice.
+ *
+ * This is pretty heavily tied to how many nested functions the callOnce
+ * higher order function works, so it's a little fragile.
+ *
+ * @param stack string The stacktrace string to get the offending function
+ * name and location from.
+ */
+function getDoubleCalledMiddlewareFunction(stack : string): string | undefined {
+    const [,,callee] = stack.split("\n");
+
+    if (callee !== undefined) {
+        return callee.trim();
+    }
+
+    return undefined;
 }
